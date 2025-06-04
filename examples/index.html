@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lobster.js Examples</title>
+    <link rel="icon" type="image/svg+xml" href="../public/favicon.svg" />
+    <link rel="stylesheet" href="../dist/styles/lobster.css" />
+    <style>
+      :root {
+        --container-width: 800px;
+      }
+
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        line-height: 1.5;
+        margin: 0;
+        padding: 20px;
+        background-color: #f8fafc;
+        color: #1e293b;
+      }
+
+      .container {
+        max-width: var(--container-width);
+        margin: 0 auto;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        color: #0f172a;
+      }
+
+      .header p {
+        font-size: 1.1rem;
+        color: #64748b;
+      }
+
+      .example-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        margin-bottom: 40px;
+      }
+
+      .example-card {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .example-card:last-child {
+        grid-column: 1 / -1;
+      }
+
+      @media (max-width: 1024px) {
+        .example-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .example-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .example-card h3 {
+        margin-top: 0;
+        margin-bottom: 16px;
+        color: #0f172a;
+        font-size: 1.25rem;
+      }
+
+      .example-card p {
+        margin-bottom: 16px;
+        color: #64748b;
+        font-size: 0.9rem;
+      }
+
+      .select-container {
+        margin-bottom: 16px;
+      }
+
+      .code-block {
+        background: #f1f5f9;
+        padding: 12px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-family: monospace;
+        margin-top: 12px;
+        white-space: pre-wrap;
+      }
+
+      .output {
+        margin-top: 12px;
+        padding: 8px;
+        background: #f8fafc;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        color: #64748b;
+      }
+
+      .theme-dark.example-card {
+        color: #e5e7eb;
+        background-color: #1f2937;
+        border: 1px solid #374151;
+      }
+
+      .theme-dark.example-card h3 {
+        color: #f3f4f6;
+        margin-top: 0;
+        margin-bottom: 16px;
+      }
+
+      .theme-dark.example-card p {
+        color: #9ca3af;
+      }
+
+      .theme-dark .output {
+        background-color: #111827;
+        color: #9ca3af;
+      }
+
+      .theme-dark .lobster-select {
+        --lobster-primary: #60a5fa;
+        --lobster-primary-alpha: rgba(96, 165, 250, 0.1);
+        --lobster-primary-alpha-hover: rgba(96, 165, 250, 0.15);
+        --lobster-border: #374151;
+        --lobster-text: #e5e7eb;
+        --lobster-disabled: #6b7280;
+        --lobster-background: #1f2937;
+        --lobster-hover: #374151;
+        --lobster-shadow: rgba(0, 0, 0, 0.25);
+      }
+
+      .theme-green.example-card {
+        color: #064e3b;
+        background-color: #ecfdf5;
+        border: 1px solid #d1fae5;
+      }
+
+      .theme-green.example-card h3 {
+        color: #065f46;
+      }
+
+      .theme-green.example-card p {
+        color: #047857;
+      }
+
+      .theme-green .output {
+        background-color: #f0fdf4;
+        color: #047857;
+      }
+
+      .theme-green .lobster-select {
+        --lobster-primary: #059669;
+        --lobster-primary-alpha: rgba(5, 150, 105, 0.1);
+        --lobster-primary-alpha-hover: rgba(5, 150, 105, 0.15);
+        --lobster-border: #a7f3d0;
+        --lobster-text: #064e3b;
+        --lobster-disabled: #6ee7b7;
+        --lobster-background: #ffffff;
+        --lobster-hover: #f0fdf4;
+        --lobster-shadow: rgba(5, 150, 105, 0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <h1>🦞Lobster.js Examples</h1>
+        <p>
+          A collection of examples demonstrating different features of the
+          Lobster.js select component
+        </p>
+      </header>
+
+      <div class="example-grid">
+        <!-- Basic Example -->
+        <div class="example-card">
+          <h3>Basic Select</h3>
+          <p>Simple select with basic options</p>
+          <div class="select-container" id="basic-select"></div>
+          <div class="output" id="basic-output">Selected: none</div>
+        </div>
+
+        <!-- Searchable Example -->
+        <div class="example-card">
+          <h3>Searchable Select</h3>
+          <p>Select with search functionality</p>
+          <div class="select-container" id="searchable-select"></div>
+          <div class="output" id="searchable-output">Selected: none</div>
+        </div>
+
+        <!-- Clearable Example -->
+        <div class="example-card">
+          <h3>Clearable Select</h3>
+          <p>Select with clear option</p>
+          <div class="select-container" id="clearable-select"></div>
+          <div class="output" id="clearable-output">Selected: none</div>
+        </div>
+
+        <!-- Disabled Options Example -->
+        <div class="example-card">
+          <h3>Disabled Options</h3>
+          <p>Select with some disabled options</p>
+          <div class="select-container" id="disabled-select"></div>
+          <div class="output" id="disabled-output">Selected: none</div>
+        </div>
+
+        <!-- Dark Theme Example -->
+        <div class="example-card theme-dark">
+          <h3>Dark Theme</h3>
+          <p>Select with dark theme using CSS variables</p>
+          <div class="select-container" id="dark-select"></div>
+          <div class="output" id="dark-output">Selected: none</div>
+        </div>
+
+        <!-- Theming Example -->
+        <div class="example-card theme-green">
+          <h3>Custom Theme</h3>
+          <p>Select with custom theme using CSS variables</p>
+          <div class="select-container" id="green-select"></div>
+          <div class="output" id="green-output">Selected: none</div>
+        </div>
+
+        <!-- Programmatic Control -->
+        <div class="example-card">
+          <h3>Programmatic Control</h3>
+          <p>Control select programmatically</p>
+          <div class="select-container" id="programmatic-select"></div>
+          <div class="output" id="programmatic-output">Selected: none</div>
+          <button onclick="setRandomValue()">Set Random Value</button>
+          <button onclick="clearValue()">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { Select } from "../dist/index.min.js";
+
+      // Common options
+      const fruits = [
+        { value: "apple", label: "Apple 🍎" },
+        { value: "banana", label: "Banana 🍌" },
+        { value: "orange", label: "Orange 🍊" },
+        { value: "grape", label: "Grape 🍇" },
+        { value: "watermelon", label: "Watermelon 🍉" },
+      ];
+
+      // Basic Select
+      const basicSelect = new Select("#basic-select", fruits, {
+        placeholder: "Select a fruit",
+      });
+      basicSelect.container.addEventListener("change", (event) => {
+        document.getElementById(
+          "basic-output"
+        ).textContent = `Selected: ${event.detail.label}`;
+      });
+
+      // Searchable Select
+      const searchableSelect = new Select("#searchable-select", fruits, {
+        placeholder: "Search fruits",
+        searchable: true,
+      });
+      searchableSelect.container.addEventListener("change", (event) => {
+        document.getElementById(
+          "searchable-output"
+        ).textContent = `Selected: ${event.detail.label}`;
+      });
+
+      // Clearable Select
+      const clearableSelect = new Select("#clearable-select", fruits, {
+        placeholder: "Select a fruit",
+        clearable: true,
+      });
+      clearableSelect.container.addEventListener("change", (event) => {
+        document.getElementById(
+          "clearable-output"
+        ).textContent = `Selected: ${event.detail.label}`;
+      });
+
+      // Disabled Options
+      const disabledOptions = [
+        { value: "apple", label: "Apple 🍎" },
+        { value: "banana", label: "Banana 🍌", disabled: true },
+        { value: "orange", label: "Orange 🍊" },
+        { value: "grape", label: "Grape 🍇", disabled: true },
+        { value: "watermelon", label: "Watermelon 🍉" },
+      ];
+      const disabledSelect = new Select("#disabled-select", disabledOptions, {
+        placeholder: "Select a fruit",
+      });
+      disabledSelect.container.addEventListener("change", (event) => {
+        document.getElementById(
+          "disabled-output"
+        ).textContent = `Selected: ${event.detail.label}`;
+      });
+
+      // Dark Theme
+      const darkSelect = new Select("#dark-select", fruits, {
+        placeholder: "Select a fruit",
+      });
+      darkSelect.container.addEventListener("change", (event) => {
+        document.getElementById(
+          "dark-output"
+        ).textContent = `Selected: ${event.detail.label}`;
+      });
+
+      // Green Theme
+      const greenSelect = new Select("#green-select", fruits, {
+        placeholder: "Select a fruit",
+      });
+      greenSelect.container.addEventListener("change", (event) => {
+        document.getElementById(
+          "green-output"
+        ).textContent = `Selected: ${event.detail.label}`;
+      });
+
+      // Programmatic Control
+      const programmaticSelect = new Select("#programmatic-select", fruits, {
+        placeholder: "Select a fruit",
+      });
+      programmaticSelect.container.addEventListener("change", (event) => {
+        document.getElementById(
+          "programmatic-output"
+        ).textContent = `Selected: ${event.detail.label}`;
+      });
+
+      // Global functions for programmatic control
+      window.setRandomValue = () => {
+        const randomIndex = Math.floor(Math.random() * fruits.length);
+        programmaticSelect.setValue(fruits[randomIndex].value);
+      };
+
+      window.clearValue = () => {
+        programmaticSelect.clear(true); // Force clear even though clearable is false
+        document.getElementById("programmatic-output").textContent =
+          "Selected: none";
+      };
+    </script>
+  </body>
+</html>
