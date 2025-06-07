@@ -64,17 +64,28 @@ export class Select {
   }
 
   private init(): void {
-    // Create main elements
     this.container.classList.add("lobster-select");
-    if (this.config.clearable) {
-      this.container.classList.add("lobster-select--clearable");
-    }
 
-    // Create select button
+    this.initSelectButton();
+    this.initDropdown();
+    this.initSearchInput();
+    this.renderOptions();
+
+    document.addEventListener("click", (e) => this.handleOutsideClick(e));
+  }
+
+  private initDropdown(): void {
+    this.dropdown = document.createElement("div");
+    this.dropdown.classList.add("lobster-select__dropdown");
+    this.container.appendChild(this.dropdown);
+  }
+
+  private initSelectButton(): void {
     this.selectButton = document.createElement("div");
     this.selectButton.classList.add("lobster-select__button");
 
     const buttonText = document.createElement("span");
+
     buttonText.classList.add("lobster-select__button-text");
     buttonText.textContent = this.config.placeholder!;
 
@@ -83,6 +94,7 @@ export class Select {
 
     if (this.config.clearable) {
       const clearButton = document.createElement("span");
+
       clearButton.classList.add("lobster-select__clear-button");
       clearButton.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -93,42 +105,35 @@ export class Select {
         });
         this.container.dispatchEvent(event);
       });
+
       this.selectButton.appendChild(clearButton);
+      this.container.classList.add("lobster-select--clearable");
     }
 
     this.selectButton.appendChild(buttonText);
     this.selectButton.appendChild(buttonArrow);
 
-    // Create dropdown
-    this.dropdown = document.createElement("div");
-    this.dropdown.classList.add("lobster-select__dropdown");
+    this.container.appendChild(this.selectButton);
+    this.selectButton.addEventListener("click", () => this.toggle());
+  }
 
-    // Add search if enabled
-    if (this.config.searchable) {
-      const searchWrapper = document.createElement("div");
-      searchWrapper.classList.add("lobster-select__search");
-
-      this.searchInput = document.createElement("input");
-      this.searchInput.type = "text";
-      this.searchInput.placeholder = "Search...";
-      this.searchInput.classList.add("lobster-select__search-input");
-
-      searchWrapper.appendChild(this.searchInput);
-      this.dropdown.appendChild(searchWrapper);
-
-      this.searchInput.addEventListener("input", () => this.handleSearch());
+  private initSearchInput(): void {
+    if (!this.config.searchable) {
+      return;
     }
 
-    // Add options
-    this.renderOptions();
+    const searchWrapper = document.createElement("div");
+    searchWrapper.classList.add("lobster-select__search");
 
-    // Append elements
-    this.container.appendChild(this.selectButton);
-    this.container.appendChild(this.dropdown);
+    this.searchInput = document.createElement("input");
+    this.searchInput.type = "text";
+    this.searchInput.placeholder = "Search...";
+    this.searchInput.classList.add("lobster-select__search-input");
 
-    // Add event listeners
-    this.selectButton.addEventListener("click", () => this.toggle());
-    document.addEventListener("click", (e) => this.handleOutsideClick(e));
+    searchWrapper.appendChild(this.searchInput);
+    this.dropdown.appendChild(searchWrapper);
+
+    this.searchInput.addEventListener("input", () => this.handleSearch());
   }
 
   private renderOptions(): void {
@@ -152,7 +157,6 @@ export class Select {
       optionsList.appendChild(optionElement);
     });
 
-    // Clear existing options
     const existingOptions = this.dropdown.querySelector(
       ".lobster-select__options"
     );
@@ -204,15 +208,12 @@ export class Select {
     }
     this.container.classList.add("has-value");
 
-    // Update selected state in options
-    const options = this.dropdown.querySelectorAll(".lobster-select__option");
-    options.forEach((optionEl, index) => {
-      if (this.options[index].value === option.value) {
-        optionEl.classList.add("lobster-select__option--selected");
-      } else {
-        optionEl.classList.remove("lobster-select__option--selected");
-      }
-    });
+    this.dropdown
+      .querySelectorAll(".lobster-select__option")
+      .forEach((optionEl, index) => {
+        const isChosen = this.options[index].value === option.value;
+        optionEl.classList.toggle("lobster-select__option--selected", isChosen);
+      });
 
     this.close();
 
@@ -250,7 +251,6 @@ export class Select {
     }
   }
 
-  // Public methods
   public getValue(): string | undefined {
     return this.selectedOption?.value;
   }
@@ -277,7 +277,6 @@ export class Select {
     }
     this.container.classList.remove("has-value");
 
-    // Remove selected state from options
     const options = this.dropdown.querySelectorAll(".lobster-select__option");
     options.forEach((option) => {
       option.classList.remove("lobster-select__option--selected");
