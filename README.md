@@ -88,6 +88,9 @@ select.updateOptions([{ value: "4", label: "New Option" }]);
 // Disable/Enable
 select.disable();
 select.enable();
+
+// Destroy component
+select.destroy();
 ```
 
 ### Event Handling
