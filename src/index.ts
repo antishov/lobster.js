@@ -32,7 +32,7 @@ declare global {
 }
 
 export class Select {
-  private container: HTMLElement;
+  private container!: HTMLElement;
   private selectButton!: HTMLElement;
   private dropdown!: HTMLElement;
   private searchInput?: HTMLInputElement;
@@ -46,12 +46,6 @@ export class Select {
     options: SelectOption[] = [],
     config: SelectConfig = {}
   ) {
-    const container = document.querySelector(selector);
-    if (!container) {
-      throw new Error(`Element with selector "${selector}" not found`);
-    }
-
-    this.container = container as HTMLElement;
     this.options = options;
     this.config = {
       placeholder: "Select option",
@@ -60,18 +54,27 @@ export class Select {
       ...config,
     };
 
+    this.initContainer(selector);
     this.init();
   }
 
   private init(): void {
-    this.container.classList.add("lobster-select");
-
     this.initSelectButton();
     this.initDropdown();
     this.initSearchInput();
     this.renderOptions();
 
     document.addEventListener("click", (e) => this.handleOutsideClick(e));
+  }
+
+  private initContainer(selector: string): void {
+    this.container = document.createElement("div");
+
+    if (this.container === null) {
+      throw new Error(`Element with selector "${selector}" not found`);
+    }
+
+    this.container.classList.add("lobster-select");
   }
 
   private initDropdown(): void {
