@@ -22,6 +22,7 @@ declare global {
 }
 export declare class Select {
     private container;
+    private node;
     private selectButton;
     private dropdown;
     private searchInput?;
@@ -29,8 +30,13 @@ export declare class Select {
     private selectedOption?;
     private isOpen;
     private config;
+    private outsideClickHandler;
     constructor(selector: string, options?: SelectOption[], config?: SelectConfig);
     private init;
+    private initContainer;
+    private initDropdown;
+    private initSelectButton;
+    private initSearchInput;
     private renderOptions;
     private handleSearch;
     private selectOption;
@@ -44,5 +50,6 @@ export declare class Select {
     updateOptions(options: SelectOption[]): void;
     disable(): void;
     enable(): void;
+    destroy(): void;
 }
 export {};

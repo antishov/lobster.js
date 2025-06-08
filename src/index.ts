@@ -33,6 +33,7 @@ declare global {
 
 export class Select {
   private container!: HTMLElement;
+  private node!: HTMLElement;
   private selectButton!: HTMLElement;
   private dropdown!: HTMLElement;
   private searchInput?: HTMLInputElement;
@@ -40,6 +41,7 @@ export class Select {
   private selectedOption?: SelectOption;
   private isOpen = false;
   private config: SelectConfig;
+  private outsideClickHandler!: (event: MouseEvent) => void;
 
   constructor(
     selector: string,
@@ -64,23 +66,30 @@ export class Select {
     this.initSearchInput();
     this.renderOptions();
 
-    document.addEventListener("click", (e) => this.handleOutsideClick(e));
+    this.outsideClickHandler = this.handleOutsideClick.bind(this);
+
+    document.addEventListener("click", this.outsideClickHandler);
   }
 
   private initContainer(selector: string): void {
-    this.container = document.createElement("div");
+    const container = document.querySelector<HTMLElement>(selector);
 
-    if (this.container === null) {
+    if (container === null) {
       throw new Error(`Element with selector "${selector}" not found`);
     }
 
-    this.container.classList.add("lobster-select");
+    this.container = container;
+
+    this.node = document.createElement("div");
+    this.node.classList.add("lobster-select");
+
+    this.container.appendChild(this.node);
   }
 
   private initDropdown(): void {
     this.dropdown = document.createElement("div");
     this.dropdown.classList.add("lobster-select__dropdown");
-    this.container.appendChild(this.dropdown);
+    this.node.appendChild(this.dropdown);
   }
 
   private initSelectButton(): void {
@@ -106,17 +115,17 @@ export class Select {
           value: "",
           label: "",
         });
-        this.container.dispatchEvent(event);
+        this.node.dispatchEvent(event);
       });
 
       this.selectButton.appendChild(clearButton);
-      this.container.classList.add("lobster-select--clearable");
+      this.node.classList.add("lobster-select--clearable");
     }
 
     this.selectButton.appendChild(buttonText);
     this.selectButton.appendChild(buttonArrow);
 
-    this.container.appendChild(this.selectButton);
+    this.node.appendChild(this.selectButton);
     this.selectButton.addEventListener("click", () => this.toggle());
   }
 
@@ -209,7 +218,7 @@ export class Select {
     if (buttonText) {
       buttonText.textContent = option.label;
     }
-    this.container.classList.add("has-value");
+    this.node.classList.add("has-value");
 
     this.dropdown
       .querySelectorAll(".lobster-select__option")
@@ -224,7 +233,7 @@ export class Select {
       value: option.value,
       label: option.label,
     });
-    this.container.dispatchEvent(event);
+    this.node.dispatchEvent(event);
   }
 
   private toggle(): void {
@@ -233,7 +242,7 @@ export class Select {
 
   private open(): void {
     this.isOpen = true;
-    this.container.classList.add("lobster-select--open");
+    this.node.classList.add("lobster-select--open");
     if (this.searchInput) {
       this.searchInput.focus();
     }
@@ -241,7 +250,7 @@ export class Select {
 
   private close(): void {
     this.isOpen = false;
-    this.container.classList.remove("lobster-select--open");
+    this.node.classList.remove("lobster-select--open");
     if (this.searchInput) {
       this.searchInput.value = "";
       this.renderOptions();
@@ -249,7 +258,7 @@ export class Select {
   }
 
   private handleOutsideClick(event: MouseEvent): void {
-    if (!this.container.contains(event.target as Node)) {
+    if (!this.node.contains(event.target as Node)) {
       this.close();
     }
   }
@@ -278,7 +287,7 @@ export class Select {
     if (buttonText) {
       buttonText.textContent = this.config.placeholder || "";
     }
-    this.container.classList.remove("has-value");
+    this.node.classList.remove("has-value");
 
     const options = this.dropdown.querySelectorAll(".lobster-select__option");
     options.forEach((option) => {
@@ -292,12 +301,20 @@ export class Select {
   }
 
   public disable(): void {
-    this.container.classList.add("lobster-select--disabled");
+    this.node.classList.add("lobster-select--disabled");
     this.selectButton.removeEventListener("click", () => this.toggle());
   }
 
   public enable(): void {
-    this.container.classList.remove("lobster-select--disabled");
+    this.node.classList.remove("lobster-select--disabled");
     this.selectButton.addEventListener("click", () => this.toggle());
+  }
+
+  public destroy(): void {
+    this.node.remove();
+
+    if (this.outsideClickHandler !== null) {
+      document.removeEventListener("click", this.outsideClickHandler);
+    }
   }
 }

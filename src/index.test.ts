@@ -22,9 +22,15 @@ describe("Select Component", () => {
   describe("Initialization", () => {
     it("should create select component with default config", () => {
       const select = new Select("#select-container", mockOptions);
-      expect(container.classList.contains("lobster-select")).toBeTruthy();
-      expect(container.querySelector(".lobster-select__button")).toBeTruthy();
-      expect(container.querySelector(".lobster-select__dropdown")).toBeTruthy();
+      expect(
+        container.firstElementChild?.classList.contains("lobster-select")
+      ).toBeTruthy();
+      expect(
+        container.firstElementChild?.querySelector(".lobster-select__button")
+      ).toBeTruthy();
+      expect(
+        container.firstElementChild?.querySelector(".lobster-select__dropdown")
+      ).toBeTruthy();
     });
 
     it("should throw error for invalid selector", () => {
@@ -36,7 +42,9 @@ describe("Select Component", () => {
         searchable: true,
       });
       expect(
-        container.querySelector(".lobster-select__search-input")
+        container.firstElementChild?.querySelector(
+          ".lobster-select__search-input"
+        )
       ).toBeTruthy();
     });
 
@@ -45,10 +53,14 @@ describe("Select Component", () => {
         clearable: true,
       });
       expect(
-        container.classList.contains("lobster-select--clearable")
+        container.firstElementChild?.classList.contains(
+          "lobster-select--clearable"
+        )
       ).toBeTruthy();
       expect(
-        container.querySelector(".lobster-select__clear-button")
+        container.firstElementChild?.querySelector(
+          ".lobster-select__clear-button"
+        )
       ).toBeTruthy();
     });
   });
@@ -57,14 +69,14 @@ describe("Select Component", () => {
     it("should select an option and trigger change event", () => {
       const select = new Select("#select-container", mockOptions);
       const changeHandler = jest.fn();
-      container.addEventListener("change", changeHandler);
+      container.firstElementChild?.addEventListener("change", changeHandler);
 
-      const button = container.querySelector(
+      const button = container.firstElementChild?.querySelector(
         ".lobster-select__button"
       ) as HTMLElement;
       button.click();
 
-      const firstOption = container.querySelector(
+      const firstOption = container.firstElementChild?.querySelector(
         ".lobster-select__option"
       ) as HTMLElement;
       firstOption.click();
@@ -77,22 +89,30 @@ describe("Select Component", () => {
           },
         })
       );
-      expect(container.classList.contains("has-value")).toBeTruthy();
+      expect(
+        container.firstElementChild?.classList.contains("has-value")
+      ).toBeTruthy();
     });
 
     it("should not select disabled options", () => {
       const select = new Select("#select-container", mockOptions);
       const changeHandler = jest.fn();
-      container.addEventListener("change", changeHandler);
+      container.firstElementChild?.addEventListener("change", changeHandler);
 
-      const button = container.querySelector(
+      const button = container.firstElementChild?.querySelector(
         ".lobster-select__button"
       ) as HTMLElement;
       button.click();
 
-      const options: NodeListOf<HTMLElement> = container.querySelectorAll(
-        ".lobster-select__option"
-      );
+      const options: NodeListOf<HTMLElement> | undefined =
+        container.firstElementChild?.querySelectorAll(
+          ".lobster-select__option"
+        );
+
+      if (options === undefined) {
+        throw new Error("Options not found");
+      }
+
       options[2].click();
 
       expect(changeHandler).not.toHaveBeenCalled();
@@ -105,19 +125,26 @@ describe("Select Component", () => {
         searchable: true,
       });
 
-      const button = container.querySelector(
+      const button = container.firstElementChild?.querySelector(
         ".lobster-select__button"
       ) as HTMLElement;
       button.click();
 
-      const searchInput = container.querySelector(
+      const searchInput = container.firstElementChild?.querySelector(
         ".lobster-select__search-input"
       ) as HTMLInputElement;
       searchInput.value = "Option 1";
       searchInput.dispatchEvent(new Event("input"));
 
-      const visibleOptions: NodeListOf<HTMLElement> =
-        container.querySelectorAll(".lobster-select__option");
+      const visibleOptions: NodeListOf<HTMLElement> | undefined =
+        container.firstElementChild?.querySelectorAll(
+          ".lobster-select__option"
+        );
+
+      if (visibleOptions === undefined) {
+        throw new Error("Visible options not found");
+      }
+
       expect(visibleOptions.length).toBe(1);
       expect(visibleOptions[0].textContent).toBe("Option 1");
     });
@@ -130,7 +157,7 @@ describe("Select Component", () => {
       select.setValue("2");
       expect(select.getValue()).toBe("2");
 
-      const buttonText = container.querySelector(
+      const buttonText = container.firstElementChild?.querySelector(
         ".lobster-select__button-text"
       );
       expect(buttonText?.textContent).toBe("Option 2");
@@ -145,7 +172,9 @@ describe("Select Component", () => {
       select.clear();
 
       expect(select.getValue()).toBeUndefined();
-      expect(container.classList.contains("has-value")).toBeFalsy();
+      expect(
+        container.firstElementChild?.classList.contains("has-value")
+      ).toBeFalsy();
     });
 
     it("should update options", () => {
@@ -154,7 +183,14 @@ describe("Select Component", () => {
 
       select.updateOptions(newOptions);
 
-      const options = container.querySelectorAll(".lobster-select__option");
+      const options = container.firstElementChild?.querySelectorAll(
+        ".lobster-select__option"
+      );
+
+      if (options === undefined) {
+        throw new Error("Options not found");
+      }
+
       expect(options.length).toBe(1);
       expect(options[0].textContent).toBe("New Option");
     });
@@ -164,13 +200,28 @@ describe("Select Component", () => {
 
       select.disable();
       expect(
-        container.classList.contains("lobster-select--disabled")
+        container.firstElementChild?.classList.contains(
+          "lobster-select--disabled"
+        )
       ).toBeTruthy();
 
       select.enable();
       expect(
-        container.classList.contains("lobster-select--disabled")
+        container.firstElementChild?.classList.contains(
+          "lobster-select--disabled"
+        )
       ).toBeFalsy();
+    });
+
+    it("should destroy the component", () => {
+      const documentSpy = jest.spyOn(document, "removeEventListener");
+      const select = new Select("#select-container", mockOptions);
+
+      select.destroy();
+      expect(container.firstElementChild).toBeNull();
+
+      expect(documentSpy).toHaveBeenCalled();
+      documentSpy.mockRestore();
     });
   });
 });
