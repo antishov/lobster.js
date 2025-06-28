@@ -32,7 +32,6 @@ declare global {
 }
 
 export class Select {
-  private container!: HTMLElement;
   private node!: HTMLElement;
   private selectButton!: HTMLElement;
   private dropdown!: HTMLElement;
@@ -56,7 +55,7 @@ export class Select {
       ...config,
     };
 
-    this.initContainer(selector);
+    this.initNode(selector);
     this.init();
   }
 
@@ -71,19 +70,15 @@ export class Select {
     document.addEventListener("click", this.outsideClickHandler);
   }
 
-  private initContainer(selector: string): void {
-    const container = document.querySelector<HTMLElement>(selector);
+  private initNode(selector: string): void {
+    const node = document.querySelector<HTMLElement>(selector);
 
-    if (container === null) {
+    if (node === null) {
       throw new Error(`Element with selector "${selector}" not found`);
     }
 
-    this.container = container;
-
-    this.node = document.createElement("div");
+    this.node = node;
     this.node.classList.add("lobster-select");
-
-    this.container.appendChild(this.node);
   }
 
   private initDropdown(): void {
@@ -311,7 +306,8 @@ export class Select {
   }
 
   public destroy(): void {
-    this.node.remove();
+    this.node.innerHTML = "";
+    this.node.classList.remove(...this.node.classList);
 
     if (this.outsideClickHandler !== null) {
       document.removeEventListener("click", this.outsideClickHandler);
