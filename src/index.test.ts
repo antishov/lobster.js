@@ -27,8 +27,15 @@ describe("Select Component", () => {
       expect(container.querySelector(".lobster-select__dropdown")).toBeTruthy();
     });
 
-    it("should throw error for invalid selector", () => {
-      expect(() => new Select("#non-existent", mockOptions)).toThrow();
+    describe("should throw error for", () => {
+      it("invalid selector", () => {
+        expect(() => new Select("#non-existent", mockOptions)).toThrow();
+      });
+
+      it("already initialized", () => {
+        const select = new Select("#select-container", mockOptions);
+        expect(() => new Select("#select-container", mockOptions)).toThrow();
+      });
     });
 
     it("should initialize with searchable option", () => {

@@ -77,6 +77,12 @@ export class Select {
       throw new Error(`Element with selector "${selector}" not found`);
     }
 
+    if (node.classList.contains("lobster-select")) {
+      throw new Error(
+        `Element with selector "${selector}" already initialized`
+      );
+    }
+
     this.node = node;
     this.node.classList.add("lobster-select");
   }
