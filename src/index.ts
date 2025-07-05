@@ -1,8 +1,4 @@
-interface SelectOption {
-  value: string;
-  label: string;
-  disabled?: boolean;
-}
+import { ISelectOption, SelectOption } from "./selectOption";
 
 interface SelectConfig {
   placeholder?: string;
@@ -32,10 +28,12 @@ declare global {
 }
 
 export class Select {
-  private node!: HTMLElement;
+  private node!: HTMLDivElement;
   private selectButton!: HTMLElement;
+  private buttonText!: HTMLElement;
   private dropdown!: HTMLElement;
   private searchInput?: HTMLInputElement;
+  private shadowInput: HTMLSelectElement | null = null;
   private options: SelectOption[] = [];
   private selectedOption?: SelectOption;
   private isOpen = false;
@@ -43,11 +41,18 @@ export class Select {
   private outsideClickHandler!: (event: MouseEvent) => void;
 
   constructor(
-    selector: string,
-    options: SelectOption[] = [],
+    selector: string | HTMLDivElement | HTMLSelectElement,
+    options: ISelectOption[] = [],
     config: SelectConfig = {}
   ) {
-    this.options = options;
+    this.initNode(selector);
+
+    this.options =
+      options.length === 0 && this.shadowInput !== null
+        ? Array.from(this.shadowInput.querySelectorAll("option")).map((node) =>
+            SelectOption.fromOption(node)
+          )
+        : options.map((option) => SelectOption.fromObject(option));
     this.config = {
       placeholder: "Select option",
       searchable: false,
@@ -55,7 +60,6 @@ export class Select {
       ...config,
     };
 
-    this.initNode(selector);
     this.init();
   }
 
@@ -70,11 +74,45 @@ export class Select {
     document.addEventListener("click", this.outsideClickHandler);
   }
 
-  private initNode(selector: string): void {
-    const node = document.querySelector<HTMLElement>(selector);
+  private initNode(
+    selector: string | HTMLDivElement | HTMLSelectElement
+  ): void {
+    if (typeof selector === "string") {
+      const target = document.querySelector<HTMLElement>(selector);
 
-    if (node === null) {
-      throw new Error(`Element with selector "${selector}" not found`);
+      if (target === null) {
+        throw new Error(`Element with selector "${selector}" not found`);
+      }
+
+      if (
+        !(target instanceof HTMLDivElement) &&
+        !(target instanceof HTMLSelectElement)
+      ) {
+        throw new Error(
+          "Only HTMLDivElement and HTMLSelectElement are supported."
+        );
+      }
+
+      selector = target;
+    }
+
+    let node: HTMLDivElement | null = null;
+
+    if (selector instanceof HTMLSelectElement) {
+      node = document.createElement("div");
+
+      if (selector.parentElement === null) {
+        throw new Error("Shadow input must have a parent element");
+      } else {
+        selector.parentElement.insertBefore(node, selector);
+      }
+
+      this.shadowInput = selector;
+      this.shadowInput.classList.add("lobster-select__shadow-node");
+
+      node.classList.add("has-shadow-node");
+    } else {
+      node = selector;
     }
 
     if (node.classList.contains("lobster-select")) {
@@ -97,10 +135,10 @@ export class Select {
     this.selectButton = document.createElement("div");
     this.selectButton.classList.add("lobster-select__button");
 
-    const buttonText = document.createElement("span");
+    this.buttonText = document.createElement("span");
 
-    buttonText.classList.add("lobster-select__button-text");
-    buttonText.textContent = this.config.placeholder!;
+    this.buttonText.classList.add("lobster-select__button-text");
+    this.buttonText.textContent = this.config.placeholder!;
 
     const buttonArrow = document.createElement("span");
     buttonArrow.classList.add("lobster-select__button-arrow");
@@ -123,7 +161,7 @@ export class Select {
       this.node.classList.add("lobster-select--clearable");
     }
 
-    this.selectButton.appendChild(buttonText);
+    this.selectButton.appendChild(this.buttonText);
     this.selectButton.appendChild(buttonArrow);
 
     this.node.appendChild(this.selectButton);
@@ -156,16 +194,27 @@ export class Select {
     this.options.forEach((option) => {
       const optionElement = document.createElement("div");
       optionElement.classList.add("lobster-select__option");
+
       if (option.disabled) {
         optionElement.classList.add("lobster-select__option--disabled");
-      }
-      optionElement.textContent = option.label;
-
-      if (!option.disabled) {
+      } else {
         optionElement.addEventListener("click", () =>
           this.selectOption(option)
         );
       }
+
+      if (option.selected) {
+        optionElement.classList.add("lobster-select__option--selected");
+
+        if (this.selectedOption === undefined) {
+          this.selectedOption = option;
+          this.setButtonText(option.label);
+        } else {
+          throw new Error("Select can't contain more than one chosen option");
+        }
+      }
+
+      optionElement.textContent = option.label;
 
       optionsList.appendChild(optionElement);
     });
@@ -213,12 +262,9 @@ export class Select {
 
   private selectOption(option: SelectOption): void {
     this.selectedOption = option;
-    const buttonText = this.selectButton.querySelector(
-      ".lobster-select__button-text"
-    );
-    if (buttonText) {
-      buttonText.textContent = option.label;
-    }
+
+    this.setButtonText(option.label);
+
     this.node.classList.add("has-value");
 
     this.dropdown
@@ -230,10 +276,15 @@ export class Select {
 
     this.close();
 
+    if (this.shadowInput !== null) {
+      this.shadowInput.value = option.value;
+    }
+
     const event = new SelectChangeEvent({
       value: option.value,
       label: option.label,
     });
+
     this.node.dispatchEvent(event);
   }
 
@@ -282,12 +333,9 @@ export class Select {
     }
 
     this.selectedOption = undefined;
-    const buttonText = this.selectButton.querySelector(
-      ".lobster-select__button-text"
-    );
-    if (buttonText) {
-      buttonText.textContent = this.config.placeholder || "";
-    }
+
+    this.setButtonText();
+
     this.node.classList.remove("has-value");
 
     const options = this.dropdown.querySelectorAll(".lobster-select__option");
@@ -296,8 +344,8 @@ export class Select {
     });
   }
 
-  public updateOptions(options: SelectOption[]): void {
-    this.options = options;
+  public updateOptions(options: ISelectOption[]): void {
+    this.options = options.map((option) => SelectOption.fromObject(option));
     this.renderOptions();
   }
 
@@ -315,8 +363,20 @@ export class Select {
     this.node.innerHTML = "";
     this.node.classList.remove(...this.node.classList);
 
+    if (this.shadowInput !== null) {
+      this.shadowInput.classList.remove("lobster-select__shadow-node");
+    }
+
     if (this.outsideClickHandler !== null) {
       document.removeEventListener("click", this.outsideClickHandler);
     }
+  }
+
+  private setButtonText(text: string | null = null): void {
+    if (this.buttonText === undefined) {
+      return;
+    }
+
+    this.buttonText.textContent = text ?? this.config.placeholder ?? "";
   }
 }

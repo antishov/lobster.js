@@ -55,8 +55,8 @@
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       }
 
-      .example-card:last-child {
-        grid-column: 1 / -1;
+      .example-card.g-2 {
+        grid-column: 1 / 3;
       }
 
       @media (max-width: 1024px) {
@@ -170,6 +170,10 @@
         --lobster-hover: #f0fdf4;
         --lobster-shadow: rgba(5, 150, 105, 0.1);
       }
+
+      #shadow-node.lobster-select__shadow-node {
+        display: initial !important;
+      }
     </style>
   </head>
   <body>
@@ -232,13 +236,25 @@
         </div>
 
         <!-- Programmatic Control -->
-        <div class="example-card">
+        <div class="example-card g-2">
           <h3>Programmatic Control</h3>
           <p>Control select programmatically</p>
           <div class="select-container" id="programmatic-select"></div>
           <div class="output" id="programmatic-output">Selected: none</div>
           <button onclick="setRandomValue()">Set Random Value</button>
           <button onclick="clearValue()">Clear</button>
+        </div>
+
+        <!-- Shadow Node -->
+        <div class="example-card">
+          <h3>Shadow Node</h3>
+          <p>Initialize select using HTMLSelectElement</p>
+          <div class="select-container" id="shadow-select"></div>
+          <select id="shadow-node" disabled>
+            <option value="apple">Apple 🍎</option>
+            <option value="banana" disabled>Banana 🍌</option>
+            <option value="orange" selected>Orange 🍊</option>
+          </select>
         </div>
       </div>
     </div>
@@ -259,7 +275,7 @@
       const basicSelect = new Select("#basic-select", fruits, {
         placeholder: "Select a fruit",
       });
-      basicSelect.container.addEventListener("change", (event) => {
+      basicSelect.node.addEventListener("change", (event) => {
         document.getElementById(
           "basic-output"
         ).textContent = `Selected: ${event.detail.label}`;
@@ -270,7 +286,7 @@
         placeholder: "Search fruits",
         searchable: true,
       });
-      searchableSelect.container.addEventListener("change", (event) => {
+      searchableSelect.node.addEventListener("change", (event) => {
         document.getElementById(
           "searchable-output"
         ).textContent = `Selected: ${event.detail.label}`;
@@ -281,7 +297,7 @@
         placeholder: "Select a fruit",
         clearable: true,
       });
-      clearableSelect.container.addEventListener("change", (event) => {
+      clearableSelect.node.addEventListener("change", (event) => {
         document.getElementById(
           "clearable-output"
         ).textContent = `Selected: ${event.detail.label}`;
@@ -298,7 +314,7 @@
       const disabledSelect = new Select("#disabled-select", disabledOptions, {
         placeholder: "Select a fruit",
       });
-      disabledSelect.container.addEventListener("change", (event) => {
+      disabledSelect.node.addEventListener("change", (event) => {
         document.getElementById(
           "disabled-output"
         ).textContent = `Selected: ${event.detail.label}`;
@@ -308,7 +324,7 @@
       const darkSelect = new Select("#dark-select", fruits, {
         placeholder: "Select a fruit",
       });
-      darkSelect.container.addEventListener("change", (event) => {
+      darkSelect.node.addEventListener("change", (event) => {
         document.getElementById(
           "dark-output"
         ).textContent = `Selected: ${event.detail.label}`;
@@ -318,7 +334,7 @@
       const greenSelect = new Select("#green-select", fruits, {
         placeholder: "Select a fruit",
       });
-      greenSelect.container.addEventListener("change", (event) => {
+      greenSelect.node.addEventListener("change", (event) => {
         document.getElementById(
           "green-output"
         ).textContent = `Selected: ${event.detail.label}`;
@@ -328,7 +344,7 @@
       const programmaticSelect = new Select("#programmatic-select", fruits, {
         placeholder: "Select a fruit",
       });
-      programmaticSelect.container.addEventListener("change", (event) => {
+      programmaticSelect.node.addEventListener("change", (event) => {
         document.getElementById(
           "programmatic-output"
         ).textContent = `Selected: ${event.detail.label}`;
@@ -345,6 +361,9 @@
         document.getElementById("programmatic-output").textContent =
           "Selected: none";
       };
+
+      // Shadow node
+      const shadowSelect = new Select("#shadow-node");
     </script>
   </body>
 </html>

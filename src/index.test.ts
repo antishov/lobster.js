@@ -2,15 +2,42 @@ import { Select } from "./index";
 
 describe("Select Component", () => {
   let container: HTMLDivElement;
+  let shadowInput: HTMLSelectElement;
 
   beforeEach(() => {
+    shadowInput = document.createElement("select");
+    shadowInput.id = "shadow-input";
+    document.body.appendChild(shadowInput);
+
+    const shadowOption1 = document.createElement("option");
+    shadowOption1.value = "1";
+    shadowOption1.innerText = "Shadow option 1";
+
+    shadowInput.appendChild(shadowOption1);
+
+    const shadowOption2 = document.createElement("option");
+    shadowOption2.value = "2";
+    shadowOption2.innerText = "Shadow option 2";
+    shadowOption2.selected = true;
+
+    shadowInput.appendChild(shadowOption2);
+
+    const shadowOption3 = document.createElement("option");
+    shadowOption3.value = "3";
+    shadowOption3.innerText = "Shadow option 3";
+    shadowOption3.disabled = true;
+
+    shadowInput.appendChild(shadowOption3);
+
     container = document.createElement("div");
     container.id = "select-container";
     document.body.appendChild(container);
   });
 
   afterEach(() => {
-    document.body.removeChild(container);
+    Array.from(document.body.childNodes).forEach((node) =>
+      document.body.removeChild(node)
+    );
   });
 
   const mockOptions = [
@@ -38,25 +65,85 @@ describe("Select Component", () => {
       });
     });
 
-    it("should initialize with searchable option", () => {
-      const select = new Select("#select-container", mockOptions, {
-        searchable: true,
+    describe("should initialize with", () => {
+      it("HTMLDivElement as a container", () => {
+        const select = new Select(container, mockOptions);
+        expect(container.classList.contains("lobster-select")).toBeTruthy();
       });
-      expect(
-        container.querySelector(".lobster-select__search-input")
-      ).toBeTruthy();
-    });
 
-    it("should initialize with clearable option", () => {
-      const select = new Select("#select-container", mockOptions, {
-        clearable: true,
+      it("HTMLSelectElement as a container", () => {
+        const select = new Select(shadowInput);
+
+        expect(shadowInput.previousElementSibling).toBeInstanceOf(
+          HTMLDivElement
+        );
+        expect(
+          shadowInput.previousElementSibling?.classList.contains(
+            "lobster-select"
+          )
+        ).toBeTruthy();
+        expect(
+          shadowInput.previousElementSibling?.classList.contains(
+            "has-shadow-node"
+          )
+        ).toBeTruthy();
+        expect(
+          shadowInput.classList.contains("lobster-select__shadow-node")
+        ).toBeTruthy();
       });
-      expect(
-        container.classList.contains("lobster-select--clearable")
-      ).toBeTruthy();
-      expect(
-        container.querySelector(".lobster-select__clear-button")
-      ).toBeTruthy();
+
+      it("HTMLSelectElement options", () => {
+        const select = new Select(shadowInput);
+
+        const button = shadowInput.previousElementSibling?.querySelector(
+          ".lobster-select__button"
+        ) as HTMLElement;
+        button.click();
+
+        const options: NodeListOf<HTMLElement> | undefined =
+          shadowInput.previousElementSibling?.querySelectorAll(
+            ".lobster-select__option"
+          );
+
+        if (options === undefined) {
+          throw new Error("Options not found");
+        }
+
+        expect(options).toHaveLength(3);
+        expect(
+          options[1].classList.contains("lobster-select__option--selected")
+        ).toBeTruthy();
+        expect(
+          options[2].classList.contains("lobster-select__option--disabled")
+        ).toBeTruthy();
+        expect(select.getValue()).toEqual("2");
+        expect(
+          shadowInput.previousElementSibling?.querySelector<HTMLElement>(
+            ".lobster-select__button-text"
+          )?.textContent
+        ).toEqual("Shadow option 2");
+      });
+
+      it("searchable option", () => {
+        const select = new Select("#select-container", mockOptions, {
+          searchable: true,
+        });
+        expect(
+          container.querySelector(".lobster-select__search-input")
+        ).toBeTruthy();
+      });
+
+      it("clearable option", () => {
+        const select = new Select("#select-container", mockOptions, {
+          clearable: true,
+        });
+        expect(
+          container.classList.contains("lobster-select--clearable")
+        ).toBeTruthy();
+        expect(
+          container.querySelector(".lobster-select__clear-button")
+        ).toBeTruthy();
+      });
     });
   });
 
@@ -97,16 +184,44 @@ describe("Select Component", () => {
       ) as HTMLElement;
       button.click();
 
-      const options: NodeListOf<HTMLElement> | undefined =
-        container.querySelectorAll(".lobster-select__option");
-
-      if (options === undefined) {
-        throw new Error("Options not found");
-      }
+      const options: NodeListOf<HTMLElement> = container.querySelectorAll(
+        ".lobster-select__option"
+      );
 
       options[2].click();
 
       expect(changeHandler).not.toHaveBeenCalled();
+    });
+
+    describe("should pass the value to the shadow input", () => {
+      it("by programmatic control", () => {
+        const select = new Select(shadowInput);
+        select.setValue("3");
+
+        expect(shadowInput.value).toBe("3");
+      });
+
+      it("by user interaction", () => {
+        const select = new Select(shadowInput);
+
+        const button = shadowInput.previousElementSibling?.querySelector(
+          ".lobster-select__button"
+        ) as HTMLElement;
+        button.click();
+
+        const options: NodeListOf<HTMLElement> | undefined =
+          shadowInput.previousElementSibling?.querySelectorAll(
+            ".lobster-select__option"
+          );
+
+        if (options === undefined) {
+          throw new Error("Options not found");
+        }
+
+        options[0].click();
+
+        expect(shadowInput.value).toBe("1");
+      });
     });
   });
 
@@ -127,12 +242,8 @@ describe("Select Component", () => {
       searchInput.value = "Option 1";
       searchInput.dispatchEvent(new Event("input"));
 
-      const visibleOptions: NodeListOf<HTMLElement> | undefined =
+      const visibleOptions: NodeListOf<HTMLElement> =
         container.querySelectorAll(".lobster-select__option");
-
-      if (visibleOptions === undefined) {
-        throw new Error("Visible options not found");
-      }
 
       expect(visibleOptions.length).toBe(1);
       expect(visibleOptions[0].textContent).toBe("Option 1");
@@ -172,10 +283,6 @@ describe("Select Component", () => {
 
       const options = container.querySelectorAll(".lobster-select__option");
 
-      if (options === undefined) {
-        throw new Error("Options not found");
-      }
-
       expect(options.length).toBe(1);
       expect(options[0].textContent).toBe("New Option");
     });
@@ -194,16 +301,28 @@ describe("Select Component", () => {
       ).toBeFalsy();
     });
 
-    it("should destroy the component", () => {
-      const documentSpy = jest.spyOn(document, "removeEventListener");
-      const select = new Select("#select-container", mockOptions);
+    describe("destroy", () => {
+      it("should destroy the component", () => {
+        const documentSpy = jest.spyOn(document, "removeEventListener");
+        const select = new Select("#select-container", mockOptions);
 
-      select.destroy();
-      expect(container.innerHTML).toEqual("");
-      expect(container.classList.length).toEqual(0);
+        select.destroy();
+        expect(container.innerHTML).toEqual("");
+        expect(container.classList.length).toEqual(0);
 
-      expect(documentSpy).toHaveBeenCalled();
-      documentSpy.mockRestore();
+        expect(documentSpy).toHaveBeenCalled();
+        documentSpy.mockRestore();
+      });
+
+      it("should unhide shadow input", () => {
+        const select = new Select(shadowInput, mockOptions);
+
+        select.destroy();
+
+        expect(
+          shadowInput.classList.contains("lobster-select__shadow-node")
+        ).toBeFalsy();
+      });
     });
   });
 });

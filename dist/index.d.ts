@@ -1,8 +1,4 @@
-interface SelectOption {
-    value: string;
-    label: string;
-    disabled?: boolean;
-}
+import { ISelectOption } from "./selectOption";
 interface SelectConfig {
     placeholder?: string;
     searchable?: boolean;
@@ -21,19 +17,20 @@ declare global {
     }
 }
 export declare class Select {
-    private container;
     private node;
     private selectButton;
+    private buttonText;
     private dropdown;
     private searchInput?;
+    private shadowInput;
     private options;
     private selectedOption?;
     private isOpen;
     private config;
     private outsideClickHandler;
-    constructor(selector: string, options?: SelectOption[], config?: SelectConfig);
+    constructor(selector: string | HTMLDivElement | HTMLSelectElement, options?: ISelectOption[], config?: SelectConfig);
     private init;
-    private initContainer;
+    private initNode;
     private initDropdown;
     private initSelectButton;
     private initSearchInput;
@@ -47,9 +44,10 @@ export declare class Select {
     getValue(): string | undefined;
     setValue(value: string): void;
     clear(force?: boolean): void;
-    updateOptions(options: SelectOption[]): void;
+    updateOptions(options: ISelectOption[]): void;
     disable(): void;
     enable(): void;
     destroy(): void;
+    private setButtonText;
 }
 export {};

@@ -27,16 +27,27 @@ npm install lobster.js
 ### Basic Usage
 
 ```html
+<!-- Both variants are acceptable: -->
+
+<!-- Init over div element -->
 <div id="my-select"></div>
+
+<!-- Init over select element -->
+<select id="my-select">
+  <option value="1">Option 1</option>
+  <option value="2" disabled>Option 2</option>
+  <option value="3" selected>Option 3</option>
+</select>
 ```
 
 ```typescript
 import { Select } from "lobster.js";
 import "lobster.js/dist/styles/lobster.css";
 
+// [PLEASE NOTICE] In case of targeting HTMLSelectElement its options would be overwritten by these values. Leave options array empty if you don't want to overwrite them
 const options = [
   { value: "1", label: "Option 1" },
-  { value: "2", label: "Option 2" },
+  { value: "2", label: "Option 2", selected: true },
   { value: "3", label: "Option 3", disabled: true },
 ];
 
@@ -46,7 +57,6 @@ const select = new Select("#my-select", options, {
 
 // Listen for changes with type safety
 select.container.addEventListener("change", (event: SelectChangeEvent) => {
-  // TypeScript knows the shape of event.detail
   const { value, label } = event.detail;
   console.log("Selected:", { value, label });
 });
@@ -99,8 +109,6 @@ select.destroy();
 // Type-safe event handling
 select.container.addEventListener("change", (event: SelectChangeEvent) => {
   const { value, label } = event.detail;
-
-  // The event is properly typed
   console.log(`Selected option: ${label} with value: ${value}`);
 });
 ```
@@ -115,6 +123,7 @@ The component comes with a default minimalist theme and automatically supports d
 - `.lobster-select__option` - Option item
 - `.lobster-select__search` - Search input container
 - `.lobster-select__search-input` - Search input
+- `.lobster-select__shadow-node` - Shadow select element
 
 ### Custom Styling Example
 

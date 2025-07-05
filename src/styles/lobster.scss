@@ -243,4 +243,8 @@ $transition-duration: 0.2s;
       }
     }
   }
+
+  &.has-shadow-node + &__shadow-node {
+    display: none !important;
+  }
 }
