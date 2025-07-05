@@ -264,7 +264,7 @@ describe("Select Component", () => {
     });
 
     it("should clear selection", () => {
-      const select = new Select("#select-container", mockOptions, {
+      const select = new Select(shadowInput, [], {
         clearable: true,
       });
 
@@ -273,6 +273,7 @@ describe("Select Component", () => {
 
       expect(select.getValue()).toBeUndefined();
       expect(container.classList.contains("has-value")).toBeFalsy();
+      expect(shadowInput.value).toBe("");
     });
 
     it("should update options", () => {

@@ -342,6 +342,10 @@ export class Select {
     options.forEach((option) => {
       option.classList.remove("lobster-select__option--selected");
     });
+
+    if (this.shadowInput !== null) {
+      this.shadowInput.value = "";
+    }
   }
 
   public updateOptions(options: ISelectOption[]): void {

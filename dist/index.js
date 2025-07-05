@@ -228,6 +228,9 @@ export class Select {
         options.forEach((option) => {
             option.classList.remove("lobster-select__option--selected");
         });
+        if (this.shadowInput !== null) {
+            this.shadowInput.value = "";
+        }
     }
     updateOptions(options) {
         this.options = options.map((option) => SelectOption.fromObject(option));
