@@ -133,9 +133,11 @@ select.container.addEventListener("change", (event: SelectChangeEvent) => {
 The component comes with a default minimalist theme and automatically supports dark mode based on system preferences. You can override the default styles by targeting the following classes:
 
 - `.lobster-select` - Main container
-- `.lobster-select__button` - Select button
+- `.lobster-select__button` - Dropdown button
+- `.lobster-select__button-arrow` - Dropdown button icon
 - `.lobster-select__dropdown` - Dropdown container
 - `.lobster-select__option` - Option item
+- `.lobster-select__option-check` - Selected option icon
 - `.lobster-select__search` - Search input container
 - `.lobster-select__search-input` - Search input
 - `.lobster-select__shadow-node` - Shadow select element
@@ -172,6 +174,8 @@ The component comes with a default minimalist theme and automatically supports d
 }
 
 // Additional custom styles
+
+// Select component
 .lobster-select {
   // Your custom styles
   &__button {
@@ -180,6 +184,14 @@ The component comes with a default minimalist theme and automatically supports d
 
   &__option {
     // Custom option styles
+  }
+}
+
+// Icons
+.li {
+  // Your custom styles
+  &.li-mark {
+    // Custom icon styles
   }
 }
 ```

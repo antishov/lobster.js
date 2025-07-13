@@ -133,16 +133,32 @@ describe("Select Component", () => {
         ).toBeTruthy();
       });
 
-      it("clearable option", () => {
-        const select = new Select("#select-container", mockOptions, {
-          clearable: true,
+      describe("clearable option", () => {
+        it("should clear selected option", () => {
+          const select = new Select("#select-container", mockOptions, {
+            clearable: true,
+          });
+
+          select.setValue("2");
+
+          expect(
+            container.classList.contains("lobster-select--clearable")
+          ).toBeTruthy();
+
+          const button = container.querySelector(
+            ".lobster-select__clear-button"
+          ) as HTMLElement;
+
+          expect(button).toBeTruthy();
+          button.click();
+
+          expect(
+            container.querySelector(".lobster-select__option--selected")
+          ).toBeFalsy();
+          expect(
+            container.querySelector(".lobster-select__option-check")
+          ).toBeFalsy();
         });
-        expect(
-          container.classList.contains("lobster-select--clearable")
-        ).toBeTruthy();
-        expect(
-          container.querySelector(".lobster-select__clear-button")
-        ).toBeTruthy();
       });
 
       describe("autoclose option", () => {
@@ -334,6 +350,9 @@ describe("Select Component", () => {
       expect(select.getValue()).toBeUndefined();
       expect(container.classList.contains("has-value")).toBeFalsy();
       expect(shadowInput.value).toBe("");
+      expect(
+        container.querySelector(".lobster-select__option-check")
+      ).toBeFalsy();
     });
 
     it("should update options", () => {
@@ -384,6 +403,22 @@ describe("Select Component", () => {
           shadowInput.classList.contains("lobster-select__shadow-node")
         ).toBeFalsy();
       });
+    });
+
+    it("should select option only once", () => {
+      const select = new Select("#select-container", mockOptions);
+
+      select.setValue("2");
+      select.setValue("2");
+
+      expect(
+        container.querySelectorAll(".lobster-select__option-check").length
+      ).toBe(1);
+      expect(
+        container
+          .querySelectorAll<HTMLElement>(".lobster-select__option")[1]
+          .classList.contains("lobster-select__option--selected")
+      ).toBeTruthy();
     });
   });
 });

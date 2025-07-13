@@ -1,5 +1,7 @@
 @use "sass:color";
 
+@use "icons.scss";
+
 $border-radius: 6px;
 $transition-duration: 0.2s;
 
@@ -93,21 +95,8 @@ $transition-duration: 0.2s;
   }
 
   &__button-arrow {
-    width: 16px;
-    height: 16px;
     margin-left: 8px;
     transition: transform $transition-duration ease;
-
-    &::before {
-      content: "";
-      display: block;
-      width: 6px;
-      height: 6px;
-      border-right: 2px solid currentColor;
-      border-bottom: 2px solid currentColor;
-      transform: rotate(45deg);
-      margin: 4px auto;
-    }
   }
 
   &__clear-button {
@@ -219,6 +208,9 @@ $transition-duration: 0.2s;
     padding: 6px 12px;
     cursor: pointer;
     transition: background-color $transition-duration ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
     &:hover {
       background-color: var(--lobster-hover);

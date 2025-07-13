@@ -38,6 +38,7 @@ export declare class Select {
     private renderOptions;
     private handleSearch;
     private selectOption;
+    private toggleOptionChosenState;
     toggle(): void;
     open(): void;
     close(): void;

@@ -1,0 +1,37 @@
+$icon-size: 16px;
+$icon-border-width: 2px;
+
+.li {
+  width: $icon-size;
+  height: $icon-size;
+
+  &::before {
+    content: "";
+    display: block;
+    margin: auto;
+  }
+
+  &.li-mark::before {
+    $icon-size: 6px;
+
+    width: $icon-size;
+    height: $icon-size;
+    border-right: $icon-border-width solid currentColor;
+    border-bottom: $icon-border-width solid currentColor;
+    transform: rotate(45deg);
+    margin-top: 4px;
+    margin-bottom: 4px;
+  }
+
+  &.li-check::before {
+    $icon-size: 6px;
+
+    width: $icon-size;
+    height: $icon-size * 1.5;
+    border-right: $icon-border-width solid currentColor;
+    border-bottom: $icon-border-width solid currentColor;
+    transform: rotate(45deg);
+    margin-top: 1px;
+    margin-bottom: 4px;
+  }
+}

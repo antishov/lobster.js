@@ -75,7 +75,7 @@ export class Select {
         this.buttonText.classList.add("lobster-select__button-text");
         this.buttonText.textContent = this.config.placeholder;
         const buttonArrow = document.createElement("span");
-        buttonArrow.classList.add("lobster-select__button-arrow");
+        buttonArrow.classList.add("lobster-select__button-arrow", "li", "li-mark");
         if (this.config.clearable) {
             const clearButton = document.createElement("span");
             clearButton.classList.add("lobster-select__clear-button");
@@ -169,10 +169,7 @@ export class Select {
         this.node.classList.add("has-value");
         this.dropdown
             .querySelectorAll(".lobster-select__option")
-            .forEach((optionEl, index) => {
-            const isChosen = this.options[index].value === option.value;
-            optionEl.classList.toggle("lobster-select__option--selected", isChosen);
-        });
+            .forEach((optionEl, index) => this.toggleOptionChosenState(optionEl, this.options[index].value === option.value));
         if (this.config.autoclose) {
             this.close();
         }
@@ -184,6 +181,18 @@ export class Select {
             label: option.label,
         });
         this.node.dispatchEvent(event);
+    }
+    toggleOptionChosenState(option, isChosen) {
+        option.classList.toggle("lobster-select__option--selected", isChosen);
+        let icon = option.querySelector(".lobster-select__option-check");
+        if (icon === null && isChosen) {
+            icon = document.createElement("div");
+            icon.classList.add("lobster-select__option-check", "li", "li-check");
+            option.appendChild(icon);
+        }
+        else if (!isChosen) {
+            icon === null || icon === void 0 ? void 0 : icon.remove();
+        }
     }
     toggle() {
         this.isOpen ? this.close() : this.open();
@@ -232,10 +241,9 @@ export class Select {
         this.selectedOption = undefined;
         this.setButtonText();
         this.node.classList.remove("has-value");
-        const options = this.dropdown.querySelectorAll(".lobster-select__option");
-        options.forEach((option) => {
-            option.classList.remove("lobster-select__option--selected");
-        });
+        this.dropdown
+            .querySelectorAll(".lobster-select__option")
+            .forEach((option) => this.toggleOptionChosenState(option, false));
         if (this.shadowInput !== null) {
             this.shadowInput.value = "";
         }
