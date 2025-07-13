@@ -361,10 +361,14 @@ describe("Select Component", () => {
 
       select.updateOptions(newOptions);
 
-      const options = container.querySelectorAll(".lobster-select__option");
+      const option = container.querySelector(
+        ".lobster-select__option"
+      ) as HTMLElement;
 
-      expect(options.length).toBe(1);
-      expect(options[0].textContent).toBe("New Option");
+      expect(
+        option.querySelector<HTMLElement>(".lobster-select__option-label")
+          ?.innerText
+      ).toBe("New Option");
     });
 
     it("should handle disable and enable", () => {
