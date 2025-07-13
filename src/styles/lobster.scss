@@ -234,6 +234,18 @@ $transition-duration: 0.2s;
         background-color: transparent;
       }
     }
+
+    &-label {
+      line-height: 1lh;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    &-check {
+      margin-left: 8px;
+      min-width: 16px;
+    }
   }
 
   &.has-shadow-node + &__shadow-node {

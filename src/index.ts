@@ -216,8 +216,11 @@ export class Select {
         }
       }
 
-      optionElement.textContent = option.label;
+      const label = document.createElement("span");
+      label.innerText = option.label;
+      label.classList.add("lobster-select__option-label");
 
+      optionElement.appendChild(label);
       optionsList.appendChild(optionElement);
     });
 
