@@ -144,6 +144,66 @@ describe("Select Component", () => {
           container.querySelector(".lobster-select__clear-button")
         ).toBeTruthy();
       });
+
+      describe("autoclose option", () => {
+        it("disabled", () => {
+          const select = new Select(container, mockOptions, {
+            autoclose: false,
+          });
+
+          const button = container.querySelector(
+            ".lobster-select__button"
+          ) as HTMLElement;
+          button.click();
+
+          const firstOption = container.querySelector(
+            ".lobster-select__option"
+          ) as HTMLElement;
+          firstOption.click();
+
+          expect(
+            container.classList.contains("lobster-select--open")
+          ).toBeTruthy();
+        });
+
+        it("enabled", () => {
+          const select = new Select(container, mockOptions, {
+            autoclose: true,
+          });
+
+          const button = container.querySelector(
+            ".lobster-select__button"
+          ) as HTMLElement;
+          button.click();
+
+          const firstOption = container.querySelector(
+            ".lobster-select__option"
+          ) as HTMLElement;
+          firstOption.click();
+
+          expect(
+            container.classList.contains("lobster-select--open")
+          ).toBeFalsy();
+        });
+
+        it("default behavior", () => {
+          const select = new Select(container, mockOptions);
+
+          const button = container.querySelector(
+            ".lobster-select__button"
+          ) as HTMLElement;
+          button.click();
+
+          const firstOption = container.querySelector(
+            ".lobster-select__option"
+          ) as HTMLElement;
+          firstOption.click();
+
+          expect(
+            container.classList.contains("lobster-select--open")
+          ).toBeFalsy();
+        });
+      });
     });
   });
 

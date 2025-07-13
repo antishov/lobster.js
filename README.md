@@ -83,6 +83,17 @@ const select = new Select("#my-select", options, {
 select.clear();
 ```
 
+### Do not close dropdown automatically
+
+```typescript
+const select = new Select("#my-select", options, {
+  autoclose: false,
+});
+
+select.open();
+select.setValue("2"); // Still opened
+```
+
 ### API Methods
 
 ```typescript
@@ -98,6 +109,10 @@ select.updateOptions([{ value: "4", label: "New Option" }]);
 // Disable/Enable
 select.disable();
 select.enable();
+
+// Open/Close dropdown
+select.open();
+select.close();
 
 // Destroy component
 select.destroy();

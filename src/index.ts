@@ -4,6 +4,7 @@ interface SelectConfig {
   placeholder?: string;
   searchable?: boolean;
   clearable?: boolean;
+  autoclose?: boolean;
 }
 
 interface SelectEventDetail {
@@ -57,6 +58,7 @@ export class Select {
       placeholder: "Select option",
       searchable: false,
       clearable: false,
+      autoclose: true,
       ...config,
     };
 
@@ -274,7 +276,9 @@ export class Select {
         optionEl.classList.toggle("lobster-select__option--selected", isChosen);
       });
 
-    this.close();
+    if (this.config.autoclose) {
+      this.close();
+    }
 
     if (this.shadowInput !== null) {
       this.shadowInput.value = option.value;
@@ -288,11 +292,15 @@ export class Select {
     this.node.dispatchEvent(event);
   }
 
-  private toggle(): void {
+  toggle(): void {
     this.isOpen ? this.close() : this.open();
   }
 
-  private open(): void {
+  public open(): void {
+    if (this.isOpen) {
+      return;
+    }
+
     this.isOpen = true;
     this.node.classList.add("lobster-select--open");
     if (this.searchInput) {
@@ -300,7 +308,11 @@ export class Select {
     }
   }
 
-  private close(): void {
+  public close(): void {
+    if (!this.isOpen) {
+      return;
+    }
+
     this.isOpen = false;
     this.node.classList.remove("lobster-select--open");
     if (this.searchInput) {
