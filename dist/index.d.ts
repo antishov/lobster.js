@@ -3,6 +3,7 @@ interface SelectConfig {
     placeholder?: string;
     searchable?: boolean;
     clearable?: boolean;
+    autoclose?: boolean;
 }
 interface SelectEventDetail {
     value: string;
@@ -37,9 +38,9 @@ export declare class Select {
     private renderOptions;
     private handleSearch;
     private selectOption;
-    private toggle;
-    private open;
-    private close;
+    toggle(): void;
+    open(): void;
+    close(): void;
     private handleOutsideClick;
     getValue(): string | undefined;
     setValue(value: string): void;

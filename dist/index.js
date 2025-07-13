@@ -18,7 +18,7 @@ export class Select {
             options.length === 0 && this.shadowInput !== null
                 ? Array.from(this.shadowInput.querySelectorAll("option")).map((node) => SelectOption.fromOption(node))
                 : options.map((option) => SelectOption.fromObject(option));
-        this.config = Object.assign({ placeholder: "Select option", searchable: false, clearable: false }, config);
+        this.config = Object.assign({ placeholder: "Select option", searchable: false, clearable: false, autoclose: true }, config);
         this.init();
     }
     init() {
@@ -173,7 +173,9 @@ export class Select {
             const isChosen = this.options[index].value === option.value;
             optionEl.classList.toggle("lobster-select__option--selected", isChosen);
         });
-        this.close();
+        if (this.config.autoclose) {
+            this.close();
+        }
         if (this.shadowInput !== null) {
             this.shadowInput.value = option.value;
         }
@@ -187,6 +189,9 @@ export class Select {
         this.isOpen ? this.close() : this.open();
     }
     open() {
+        if (this.isOpen) {
+            return;
+        }
         this.isOpen = true;
         this.node.classList.add("lobster-select--open");
         if (this.searchInput) {
@@ -194,6 +199,9 @@ export class Select {
         }
     }
     close() {
+        if (!this.isOpen) {
+            return;
+        }
         this.isOpen = false;
         this.node.classList.remove("lobster-select--open");
         if (this.searchInput) {
